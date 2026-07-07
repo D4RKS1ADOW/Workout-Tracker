@@ -126,7 +126,7 @@
 
     <div class="stat">
       <div class="label">Days logged</div>
-      <div class="value" id="days-logged">0/6</div>
+      <div class="value" id="days-logged">0/90</div>
       <button id="days-minus">-</button>
       <button id="days-plus">+</button>
     </div>
@@ -224,6 +224,7 @@ const SATURDAY_MOVES = [
 ];
 
 const MAXKG = 20;
+const TARGET_DAYS = 90; // configurable denominator for Days logged display
 let state = { week:1, checks:{}, manualDays: null };
 let activeDay = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay()-1];
 
@@ -249,7 +250,7 @@ async function loadState(){
       const parsed = JSON.parse(res.value);
       state.week = parsed.week || 1;
       state.checks = parsed.checks || {};
-        state.manualDays = (parsed.manualDays !== undefined) ? parsed.manualDays : null;
+      state.manualDays = (parsed.manualDays !== undefined) ? parsed.manualDays : null;
     }
   }catch(e){ /* no saved state yet */ }
 }
@@ -376,7 +377,7 @@ function renderStats(){
 
   let daysDone;
   if (typeof state.manualDays === 'number') {
-    daysDone = Math.max(0, Math.min(6, state.manualDays));
+    daysDone = Math.max(0, Math.min(TARGET_DAYS, state.manualDays));
   } else {
     daysDone = 0;
     ["Monday","Tuesday","Wednesday","Friday","Saturday"].forEach(day=>{
@@ -386,7 +387,7 @@ function renderStats(){
       if(total>0 && done>=total) daysDone++;
     });
   }
-  document.getElementById('days-logged').textContent = `${daysDone}/6`;
+  document.getElementById('days-logged').textContent = `${daysDone}/${TARGET_DAYS}`;
 }
 
 function render(){
@@ -406,7 +407,7 @@ document.getElementById('week-minus').onclick = async ()=>{
   render();
 };
 document.getElementById('days-plus').onclick = async ()=>{
-  state.manualDays = Math.min((state.manualDays ?? 0) + 1, 6);
+  state.manualDays = Math.min((state.manualDays ?? 0) + 1, TARGET_DAYS);
   await saveState();
   render();
 };
