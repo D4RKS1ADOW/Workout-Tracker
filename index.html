@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Iron Ledger — James's Weekly Training Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#101314;
+    --panel:#1a1e1f;
+    --panel-2:#20262a;
+    --steel:#2c3436;
+    --hairline:#333c3f;
+    --chalk:#ece7db;
+    --chalk-dim:#9a9c93;
+    --rust:#ef4d36;
+    --rust-dim:#3a221c;
+    --lime:#c7e83f;
+    --lime-dim:#2c3016;
+    --font-display:'Bebas Neue', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--void);color:var(--chalk);font-family:var(--font-body);}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* header */
+  .masthead{border-bottom:2px solid var(--rust);padding-bottom:16px;margin-bottom:20px;}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk-dim);margin:0 0 4px;}
+  h1{font-family:var(--font-display);font-size:44px;line-height:1;letter-spacing:.01em;margin:0;color:var(--chalk);}
+  .sub{font-size:14px;color:var(--chalk-dim);margin-top:8px;}
+
+  /* week + streak bar */
+  .statbar{display:flex;gap:12px;margin:18px 0 22px;flex-wrap:wrap;}
+  .stat{background:var(--panel);border:1px solid var(--hairline);border-radius:10px;padding:12px 16px;flex:1;min-width:130px;}
+  .stat .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--chalk-dim);margin-bottom:6px;}
+  .stat .value{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--lime);}
+  .stat button{background:var(--steel);border:1px solid var(--hairline);color:var(--chalk);font-family:var(--font-mono);font-size:12px;padding:4px 10px;border-radius:6px;cursor:pointer;margin-left:8px;}
+  .stat button:hover{background:var(--hairline);}
+
+  /* day tabs */
+  .tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;}
+  .tab{background:var(--panel);border:1px solid var(--hairline);border-radius:8px;padding:10px 4px;text-align:center;cursor:pointer;font-family:var(--font-mono);font-size:11px;color:var(--chalk-dim);}
+  .tab .d{display:block;font-size:13px;font-weight:600;color:var(--chalk);margin-bottom:2px;}
+  .tab.active{background:var(--rust-dim);border-color:var(--rust);}
+  .tab.active .d{color:var(--rust);}
+  .tab.done{border-color:var(--lime);}
+  .tab .check{color:var(--lime);font-size:10px;}
+
+  /* day panel */
+  .day-panel{background:var(--panel);border:1px solid var(--hairline);border-radius:12px;padding:20px;}
+  .day-title{font-family:var(--font-display);font-size:26px;letter-spacing:.01em;margin:0 0 2px;}
+  .day-focus{font-size:13px;color:var(--chalk-dim);margin-bottom:16px;}
+
+  table.ex{width:100%;border-collapse:collapse;font-size:13px;}
+  table.ex th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--chalk-dim);font-weight:500;padding:0 8px 8px 0;border-bottom:1px solid var(--hairline);}
+  table.ex td{padding:10px 8px;border-bottom:1px solid var(--hairline);vertical-align:middle;}
+  table.ex tr:last-child td{border-bottom:none;}
+  .ex-name{font-weight:600;color:var(--chalk);}
+  .ex-weight{font-family:var(--font-mono);color:var(--lime);white-space:nowrap;}
+  .load-bar{display:inline-flex;gap:2px;vertical-align:middle;margin-left:8px;}
+  .load-bar i{width:5px;height:12px;background:var(--steel);border-radius:1px;}
+  .load-bar i.on{background:var(--lime);}
+  .sets-cell{display:flex;gap:5px;flex-wrap:wrap;}
+  .setbox{width:22px;height:22px;border:1px solid var(--hairline);border-radius:5px;cursor:pointer;font-family:var(--font-mono);font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--chalk-dim);background:var(--panel-2);}
+  .setbox.checked{background:var(--lime-dim);border-color:var(--lime);color:var(--lime);}
+  .reps{font-family:var(--font-mono);color:var(--chalk-dim);white-space:nowrap;}
+
+  .rest-note, .conditioning{font-size:14px;line-height:1.6;color:var(--chalk-dim);}
+  .cond-list{list-style:none;padding:0;margin:0;}
+  .cond-list li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--hairline);font-size:14px;}
+  .cond-list li:last-child{border-bottom:none;}
+  .cond-list .setbox{margin-left:10px;}
+  .round-label{font-family:var(--font-mono);font-size:12px;color:var(--lime);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px;}
+  .round-label:first-child{margin-top:0;}
+
+  /* overload + nutrition */
+  .section{margin-top:22px;background:var(--panel);border:1px solid var(--hairline);border-radius:12px;padding:20px;}
+  .section h2{font-family:var(--font-display);font-size:22px;letter-spacing:.01em;margin:0 0 12px;color:var(--chalk);}
+  .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:var(--font-mono);font-size:13px;}
+  .progress-track{flex:1;height:8px;background:var(--steel);border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--rust);}
+  .overload-list{margin:14px 0 0;padding-left:18px;font-size:13.5px;color:var(--chalk-dim);line-height:1.7;}
+
+  .macros{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:4px;}
+  .macro{background:var(--panel-2);border:1px solid var(--hairline);border-radius:8px;padding:12px;}
+  .macro .m-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--chalk-dim);margin-bottom:6px;}
+  .macro .m-value{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--chalk);}
+  .macro .m-value span{color:var(--rust);}
+  .stats-line{font-size:12px;color:var(--chalk-dim);margin-top:12px;font-family:var(--font-mono);}
+
+  @media(max-width:520px){
+    h1{font-size:34px;}
+    .tabs{grid-template-columns:repeat(4,1fr);}
+    table.ex, table.ex thead{display:block;width:100%;}
+    table.ex thead{display:none;}
+    table.ex tr{display:block;padding:10px 0;border-bottom:1px solid var(--hairline);}
+    table.ex td{display:block;border:none;padding:2px 0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Home dumbbell program · James E.</p>
+    <h1>Iron Ledger</h1>
+    <p class="sub">Push / Pull / Legs / Recovery / Upper / Conditioning / Rest — 7-day split, adjustable dumbbells only.</p>
+  </div>
+
+  <div class="statbar">
+    <div class="stat">
+      <div class="label">Progression week</div>
+      <div class="value" id="week-val">1</div>
+      <button id="week-minus">−</button>
+      <button id="week-plus">+</button>
+    </div>
+    
+    <div class="stat">
+      <div class="label">Target reps/set</div>
+      <div class="value" id="target-reps">8</div>
+    </div>
+
+    <div class="stat">
+      <div class="label">Days logged</div>
+      <div class="value" id="days-logged">0/6</div>
+      <button id="days-minus">-</button>
+      <button id="days-plus">+</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="day-panel" id="day-panel"></div>
+
+  <div class="section">
+    <h2>Progressive overload</h2>
+    <div class="progress-row">
+      <span>Wk 1</span>
+      <div class="progress-track"><div class="progress-fill" id="overload-fill"></div></div>
+      <span>Wk 5+</span>
+    </div>
+    <p style="font-size:13.5px;color:var(--chalk-dim);margin:10px 0 0;">
+      Start at the listed weight for 8 reps. Add one rep per set each week. When every set of an exercise hits 12 reps, don't just add weight — you're on dumbbells at home, so make the rep itself harder:
+    </p>
+    <ul class="overload-list">
+      <li>Slow the lowering phase to 3–4 seconds</li>
+      <li>Add a 1-second pause at the bottom of the rep</li>
+      <li>Bump to 4–5 sets instead of adding load</li>
+      <li>Switch to single-arm or single-leg variations</li>
+      <li>Load a backpack with books or water bottles for push-ups and squats</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Daily targets</h2>
+    <div class="macros">
+      <div class="macro"><div class="m-label">Calories</div><div class="m-value">2,200<span>–</span>2,400 kcal</div></div>
+      <div class="macro"><div class="m-label">Protein</div><div class="m-value">160<span>–</span>180 g</div></div>
+      <div class="macro"><div class="m-label">Fat</div><div class="m-value">60<span>–</span>70 g</div></div>
+      <div class="macro"><div class="m-label">Water</div><div class="m-value">3<span>–</span>4 L</div></div>
+    </div>
+    <p class="stats-line">Fill remaining calories with carbs · basis: 177 cm, 90 kg, ~25% body fat</p>
+  </div>
+
+</div>
+
+<script>
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const FOCUS = {
+  Monday:"Push — Chest, Shoulders, Triceps",
+  Tuesday:"Pull — Back, Biceps, Forearms",
+  Wednesday:"Legs + Core",
+  Thursday:"Active Recovery — Walk + Mobility",
+  Friday:"Upper Body Strength",
+  Saturday:"Full Body Conditioning",
+  Sunday:"Rest"
+};
+
+const PLAN = {
+  Monday:[
+    {n:"Floor Dumbbell Press", w:"10 kg each", kg:10, sets:4, reps:"8–12"},
+    {n:"Incline Push-ups", w:"Bodyweight", kg:0, sets:3, reps:"12–20"},
+    {n:"Dumbbell Shoulder Press", w:"8–10 kg", kg:9, sets:4, reps:"8–12"},
+    {n:"Lateral Raises", w:"3–5 kg", kg:4, sets:4, reps:"12–15"},
+    {n:"Overhead Triceps Extension", w:"8–10 kg", kg:9, sets:3, reps:"10–15"},
+    {n:"Push-ups (Failure)", w:"Bodyweight", kg:0, sets:2, reps:"Max"}
+  ],
+  Tuesday:[
+    {n:"One-arm Dumbbell Row", w:"10 kg", kg:10, sets:4, reps:"10–15"},
+    {n:"Bent-over Reverse Fly", w:"3–5 kg", kg:4, sets:4, reps:"12–15"},
+    {n:"Hammer Curl", w:"8–10 kg", kg:9, sets:3, reps:"8–12"},
+    {n:"Biceps Curl", w:"8–10 kg", kg:9, sets:3, reps:"10–12"},
+    {n:"Wrist Curl", w:"5–8 kg", kg:6, sets:3, reps:"15"},
+    {n:"Reverse Wrist Curl", w:"3–5 kg", kg:4, sets:3, reps:"15"},
+    {n:"Farmer Carry", w:"10 kg each", kg:10, sets:3, reps:"45–60 sec"}
+  ],
+  Wednesday:[
+    {n:"Goblet Squat", w:"20 kg", kg:20, sets:4, reps:"12–15"},
+    {n:"Bulgarian Split Squat", w:"10 kg each", kg:10, sets:3, reps:"10 each leg"},
+    {n:"Romanian Deadlift", w:"10 kg each", kg:10, sets:4, reps:"10–12"},
+    {n:"Walking Lunges", w:"10 kg each", kg:10, sets:3, reps:"12 each leg"},
+    {n:"Standing Calf Raises", w:"10 kg each", kg:10, sets:4, reps:"20"}
+  ],
+  Friday:[
+    {n:"Floor Press", w:"10 kg each", kg:10, sets:5, reps:"8"},
+    {n:"One-arm Row", w:"10 kg", kg:10, sets:5, reps:"8"},
+    {n:"Shoulder Press", w:"10 kg", kg:10, sets:4, reps:"8"},
+    {n:"Hammer Curl", w:"10 kg", kg:10, sets:3, reps:"10"},
+    {n:"Overhead Extension", w:"10 kg", kg:10, sets:3, reps:"10"}
+  ]
+};
+
+const SATURDAY_ROUNDS = 4;
+const SATURDAY_MOVES = [
+  {n:"Push-ups", reps:"15"},
+  {n:"Goblet Squats (20 kg)", reps:"15"},
+  {n:"Burpees", reps:"10"},
+  {n:"Farmer Carry", reps:"60 sec"},
+  {n:"Mountain Climbers", reps:"30 sec"},
+  {n:"Plank", reps:"60 sec"}
+];
+
+const MAXKG = 20;
+let state = { week:1, checks:{}, manualDays: null };
+let activeDay = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay()-1];
+
+function loadBarHTML(kg){
+  const filled = Math.round((kg/MAXKG)*5);
+  let html = '<span class="load-bar">';
+  for(let i=0;i<5;i++) html += `<i class="${i<filled?'on':''}"></i>`;
+  html += '</span>';
+  return html;
+}
+
+function ensureDayChecks(day, exCount, setsArr){
+  if(!state.checks[day]) state.checks[day] = [];
+  for(let i=0;i<exCount;i++){
+    if(!state.checks[day][i]) state.checks[day][i] = new Array(setsArr[i]).fill(false);
+  }
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.get('workout-progress', false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state.week = parsed.week || 1;
+      state.checks = parsed.checks || {};
+        state.manualDays = (parsed.manualDays !== undefined) ? parsed.manualDays : null;
+    }
+  }catch(e){ /* no saved state yet */ }
+}
+
+async function saveState(){
+  try{
+    await window.storage.set('workout-progress', JSON.stringify(state), false);
+  }catch(e){ console.error('save failed', e); }
+}
+
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  DAYS.forEach(day=>{
+    const isRestOrRecovery = (day==='Sunday'||day==='Thursday');
+    const total = day==='Saturday' ? SATURDAY_MOVES.length*SATURDAY_ROUNDS : (PLAN[day]?PLAN[day].reduce((a,e)=>a+e.sets,0):0);
+    let done = 0;
+    if(state.checks[day]){
+      state.checks[day].forEach(arr=>{ done += arr.filter(Boolean).length; });
+    }
+    const complete = total>0 && done>=total;
+    const el = document.createElement('div');
+    el.className = 'tab' + (day===activeDay?' active':'') + (complete?' done':'');
+    el.innerHTML = `<span class="d">${day.slice(0,3)}</span>${isRestOrRecovery?'':(complete?'<span class="check">done</span>':`${done}/${total}`)}`;
+    el.onclick = () => { activeDay = day; render(); };
+    tabs.appendChild(el);
+  });
+}
+
+function renderDayPanel(){
+  const panel = document.getElementById('day-panel');
+  panel.innerHTML = '';
+  const title = document.createElement('div');
+  title.innerHTML = `<h2 class="day-title">${activeDay}</h2><p class="day-focus">${FOCUS[activeDay]}</p>`;
+  panel.appendChild(title);
+
+  if(activeDay === 'Sunday'){
+    const p = document.createElement('p');
+    p.className = 'rest-note';
+    p.textContent = "Full rest day. No lifting — let the muscle actually rebuild. Light walking or stretching is fine if you feel restless, but don't turn this into a workout.";
+    panel.appendChild(p);
+    return;
+  }
+  if(activeDay === 'Thursday'){
+    const p = document.createElement('p');
+    p.className = 'rest-note';
+    p.textContent = "Active recovery. A brisk 20–30 min walk plus mobility work for shoulders, hips, and lower back. Keep intensity low — this day exists to help Friday and Saturday go better, not to add fatigue.";
+    panel.appendChild(p);
+    return;
+  }
+
+  if(activeDay === 'Saturday'){
+    ensureDayChecks('Saturday', SATURDAY_MOVES.length*SATURDAY_ROUNDS, new Array(SATURDAY_MOVES.length*SATURDAY_ROUNDS).fill(1));
+    const list = document.createElement('div');
+    for(let r=0;r<SATURDAY_ROUNDS;r++){
+      const label = document.createElement('div');
+      label.className = 'round-label';
+      label.textContent = `Round ${r+1} of ${SATURDAY_ROUNDS}`;
+      list.appendChild(label);
+      const ul = document.createElement('ul');
+      ul.className = 'cond-list';
+      SATURDAY_MOVES.forEach((mv, idx) => {
+        const flatIdx = r*SATURDAY_MOVES.length + idx;
+        const li = document.createElement('li');
+        const checked = state.checks['Saturday'][flatIdx] && state.checks['Saturday'][flatIdx][0];
+        li.innerHTML = `<span>${mv.n} — ${mv.reps}</span><span class="setbox ${checked?'checked':''}" data-flat="${flatIdx}">${checked?'✓':''}</span>`;
+        ul.appendChild(li);
+      });
+      list.appendChild(ul);
+    }
+    panel.appendChild(list);
+    panel.querySelectorAll('.setbox[data-flat]').forEach(box=>{
+      box.onclick = async ()=>{
+        const idx = parseInt(box.dataset.flat);
+        const cur = state.checks['Saturday'][idx][0];
+        state.checks['Saturday'][idx][0] = !cur;
+        await saveState();
+        render();
+      };
+    });
+    return;
+  }
+
+  const exercises = PLAN[activeDay];
+  ensureDayChecks(activeDay, exercises.length, exercises.map(e=>e.sets));
+
+  const table = document.createElement('table');
+  table.className = 'ex';
+  table.innerHTML = `<thead><tr><th>Exercise</th><th>Weight</th><th>Reps</th><th>Sets</th></tr></thead>`;
+  const tbody = document.createElement('tbody');
+  exercises.forEach((ex, exIdx)=>{
+    const tr = document.createElement('tr');
+    const boxes = state.checks[activeDay][exIdx].map((c,setIdx)=>
+      `<span class="setbox ${c?'checked':''}" data-ex="${exIdx}" data-set="${setIdx}">${c?'✓':setIdx+1}</span>`
+    ).join('');
+    tr.innerHTML = `
+      <td class="ex-name">${ex.n}</td>
+      <td class="ex-weight">${ex.w}${ex.kg>0?loadBarHTML(ex.kg):''}</td>
+      <td class="reps">${ex.reps}</td>
+      <td><div class="sets-cell">${boxes}</div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  panel.appendChild(table);
+
+  panel.querySelectorAll('.setbox[data-ex]').forEach(box=>{
+    box.onclick = async ()=>{
+      const exIdx = parseInt(box.dataset.ex);
+      const setIdx = parseInt(box.dataset.set);
+      const cur = state.checks[activeDay][exIdx][setIdx];
+      state.checks[activeDay][exIdx][setIdx] = !cur;
+      await saveState();
+      render();
+    };
+  });
+}
+
+function renderStats(){
+  document.getElementById('week-val').textContent = state.week;
+  const reps = Math.min(8 + (state.week-1), 12);
+  document.getElementById('target-reps').textContent = state.week>=5 ? "12+ · time to progress" : reps;
+  document.getElementById('overload-fill').style.width = `${Math.min(state.week/5,1)*100}%`;
+
+  let daysDone;
+  if (typeof state.manualDays === 'number') {
+    daysDone = Math.max(0, Math.min(6, state.manualDays));
+  } else {
+    daysDone = 0;
+    ["Monday","Tuesday","Wednesday","Friday","Saturday"].forEach(day=>{
+      const total = day==='Saturday' ? SATURDAY_MOVES.length*SATURDAY_ROUNDS : PLAN[day].reduce((a,e)=>a+e.sets,0);
+      let done = 0;
+      if(state.checks[day]) state.checks[day].forEach(arr=>{ done += arr.filter(Boolean).length; });
+      if(total>0 && done>=total) daysDone++;
+    });
+  }
+  document.getElementById('days-logged').textContent = `${daysDone}/6`;
+}
+
+function render(){
+  renderTabs();
+  renderDayPanel();
+  renderStats();
+}
+
+document.getElementById('week-plus').onclick = async ()=>{
+  state.week = Math.min(state.week+1, 12);
+  await saveState();
+  render();
+};
+document.getElementById('week-minus').onclick = async ()=>{
+  state.week = Math.max(state.week-1, 1);
+  await saveState();
+  render();
+};
+document.getElementById('days-plus').onclick = async ()=>{
+  state.manualDays = Math.min((state.manualDays ?? 0) + 1, 6);
+  await saveState();
+  render();
+};
+document.getElementById('days-minus').onclick = async ()=>{
+  state.manualDays = Math.max((state.manualDays ?? 0) - 1, 0);
+  await saveState();
+  render();
+};
+
+(async ()=>{
+  await loadState();
+  render();
+})();
+</script>
+</body>
+</html>
